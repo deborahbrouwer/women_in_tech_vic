@@ -4,6 +4,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=women_in_tech_vic_dev
     ports:
       - 5432:5432
     command:
@@ -14,6 +15,30 @@ services:
       # default is 32MB;
       - "shared_buffers=128MB"
     volumes:
-      - dbserver_data:/var/lib/postgresql/data
+      - dbserver_data:/var/lib/postgresql/data:Z
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: phoenix_app
+    environment:
+      - DATABASE_URL=ecto://postgres:postgres@dbserver/women_in_tech_vic_dev
+      - SECRET_KEY_BASE=your_generated_secret_key
+      - PHX_HOST=localhost
+      - MIX_ENV=dev
+    ports:
+      - "4000:4000"
+    depends_on:
+      - dbserver
+    volumes:
+      - .:/app:Z
+      - /app/deps:Z
+      # - /app/_build:Z
+    # command: "/app/bin/women_in_tech_vic start"
+    command: [ "tail", "-f", "/dev/null" ]
+
+
+
 volumes:
   dbserver_data:
