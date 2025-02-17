@@ -7,12 +7,17 @@ info() {
     echo -e "\033[32m$1\033[0m" >&2
 }
 
-
 BINARY="/wit_shared/bin/women_in_tech_vic"
 SCRIPT="${BASH_SOURCE[0]}"
 
 # Health check: wait for the build.sh to finish
 while true; do
+    if [ ! -f "$BINARY" ]; then
+        info "Binary file does not exist yet. Sleeping..."
+        sleep 3
+        continue
+    fi
+
     CURRENT_TIME=$(date +%s)
 
     BINARY_TIME=$(stat -c %Y "$BINARY")

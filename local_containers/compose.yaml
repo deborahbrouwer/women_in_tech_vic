@@ -7,15 +7,9 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5432:5432
-    command:
-      - "postgres"
-      - "-c"
-      - "max_connections=1000"
-      - "-c"
-      # default is 32MB;
-      - "shared_buffers=128MB"
     volumes:
-      - dbserver_data:/var/lib/postgresql/data
+      - wit_dbserver_data:/var/lib/postgresql/data
+    command: ["bash", "/app/local_containers/run_database.sh"]
 
   build_container:
     container_name: wit_build
@@ -23,10 +17,10 @@ services:
       context: .
       dockerfile: Dockerfile.build
     volumes:
-      - .:/app:Z
+      - ../:/app:Z
       - wit_shared:/wit_shared
     working_dir: /app
-    command: ["bash", "/app/build.sh"]
+    command: ["bash", "/app/local_containers/build.sh"]
 
   app:
     container_name: wit_app
@@ -47,5 +41,5 @@ services:
     command: ["bash", "/wit_shared/run_app.sh"]
 
 volumes:
-  dbserver_data:
+  wit_dbserver_data:
   wit_shared:

@@ -17,7 +17,7 @@ info() {
 
 
 rm -f /wit_shared/run_app.sh
-cp /app/run_app.sh /wit_shared/run_app.sh
+cp /app/local_containers/run_app.sh /wit_shared/run_app.sh
 
 info "Fetching dependencies..."
 mix deps.get
