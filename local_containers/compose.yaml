@@ -1,16 +1,21 @@
 services:
   dbserver:
-    container_name: wit_dbserver
     image: postgres:16.3
+    container_name: wit_dbserver
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5432:5432
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=1000"
+      - "-c"
+      # default is 32MB;
+      - "shared_buffers=128MB"
     volumes:
       - wit_dbserver_data:/var/lib/postgresql/data
-      - ./run_database.sh/:/run_database.sh:z
-    command: ["bash", "/run_database.sh"]
 
   build_container:
     container_name: wit_build
@@ -21,6 +26,8 @@ services:
       - ../:/app:Z
       - wit_shared:/wit_shared
     working_dir: /app
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@wit_dbserver/women_in_tech_vic_dev
     command: ["bash", "/app/local_containers/build.sh"]
 
   app:

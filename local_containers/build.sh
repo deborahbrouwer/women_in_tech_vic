@@ -22,6 +22,14 @@ cp /app/local_containers/run_app.sh /wit_shared/run_app.sh
 info "Fetching dependencies..."
 mix deps.get
 
+echo ${DATABASE_URL}
+export DATABASE_URL=${DATABASE_URL}
+
+info "Set up database"
+mix ecto.setup || true
+
+sleep infinity
+
 info "Deploying assets..."
 mix assets.deploy
 
