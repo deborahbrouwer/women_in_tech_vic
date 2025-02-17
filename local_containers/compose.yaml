@@ -9,7 +9,8 @@ services:
       - 5432:5432
     volumes:
       - wit_dbserver_data:/var/lib/postgresql/data
-    command: ["bash", "/app/local_containers/run_database.sh"]
+      - ./run_database.sh/:/run_database.sh:z
+    command: ["bash", "/run_database.sh"]
 
   build_container:
     container_name: wit_build
