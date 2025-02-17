@@ -1,0 +1,51 @@
+services:
+  dbserver:
+    container_name: wit_dbserver
+    image: postgres:16.3
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=1000"
+      - "-c"
+      # default is 32MB;
+      - "shared_buffers=128MB"
+    volumes:
+      - dbserver_data:/var/lib/postgresql/data
+
+  build_container:
+    container_name: wit_build
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+    volumes:
+      - .:/app:Z
+      - wit_shared:/wit_shared
+    working_dir: /app
+    command: ["bash", "/app/build.sh"]
+
+  app:
+    container_name: wit_app
+    build:
+      context: .
+      dockerfile: Dockerfile.run
+    depends_on:
+      - dbserver
+      - build_container
+    volumes:
+      - wit_shared:/wit_shared
+    working_dir: /wit_shared
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@wit_dbserver/women_in_tech_vic_dev
+      - SECRET_KEY_BASE="eXamPleSecReTKeYdJp3KlcNxQ4z1LuFh6X9mVTwGAqBRZo8LJm"
+    ports:
+      - 4000:4000  # Expose Phoenix server
+    command: ["bash", "/wit_shared/run_app.sh"]
+
+volumes:
+  dbserver_data:
+  wit_shared:

@@ -1,0 +1,23 @@
+# Image is from https://hub.docker.com/r/hexpm/elixir
+
+ARG ELIXIR_VERSION=1.17.2
+ARG OTP_VERSION=27.0.1
+ARG DEBIAN_VERSION=bullseye-20240722-slim
+ARG IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+
+FROM ${IMAGE}
+
+# Install system dependencies
+RUN apt-get update -y && \
+    apt-get install -y build-essential curl git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install Rust (optional, as per your original Dockerfile)
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Installs hex the package manager for elixir
+RUN mix local.hex --force 
+
+# Installs rebar: erlang build tool
+RUN mix local.rebar --force
